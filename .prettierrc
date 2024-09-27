@@ -1,4 +1,9 @@
 {
   "singleQuote": true,
-  "trailingComma": "all"
+  "tsdoc": true,
+  "plugins": [
+    "prettier-plugin-packagejson",
+    "prettier-plugin-organize-imports",
+    "prettier-plugin-jsdoc"
+  ]
 }
