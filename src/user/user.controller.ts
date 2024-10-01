@@ -7,6 +7,7 @@ import {
   ApiResponseOptions,
   ApiTags,
 } from '@nestjs/swagger';
+import { AuthService } from 'src/auth/auth.service';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { RegisterUserCommand } from './commands/register-user/register-user.command';
 import {
@@ -19,7 +20,10 @@ import {
 @Controller()
 @ApiTags('user')
 export class UserController {
-  constructor(private readonly commandBus: CommandBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly authService: AuthService,
+  ) {}
 
   @Post('users')
   @ApiBody({ schema: registerUserJsonSchema } as ApiBodyOptions)
@@ -31,6 +35,7 @@ export class UserController {
   @UsePipes(new ZodValidationPipe(registerUserSchema))
   async registerUser(@Body() { user }: RegisterUserDto) {
     const result = await this.commandBus.execute(new RegisterUserCommand(user));
+    const token = await this.authService.generateToken(result);
 
     return {
       user: {
@@ -38,6 +43,7 @@ export class UserController {
         username: result.props.username,
         bio: result.props.bio,
         image: result.props.image,
+        token,
       },
     };
   }
