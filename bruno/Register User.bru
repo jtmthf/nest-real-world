@@ -1,0 +1,29 @@
+meta {
+  name: Register User
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/users
+  body: json
+  auth: none
+}
+
+script:pre-request {
+  const { faker } = require('@faker-js/faker');
+   
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const username = faker.internet.userName({firstName, lastName});
+  const email = faker.internet.email({firstName, lastName});
+  const password = faker.internet.password();
+   
+  req.setBody({
+    user: {
+      username,
+      email,
+      password
+    }
+  });
+}
