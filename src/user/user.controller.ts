@@ -14,6 +14,7 @@ import {
   RegisterUserDto,
   registerUserJsonSchema,
   registerUserResponseJsonSchema,
+  registerUserResponseSchema,
   registerUserSchema,
 } from './schemas/register-user.schema';
 
@@ -37,14 +38,11 @@ export class UserController {
     const result = await this.commandBus.execute(new RegisterUserCommand(user));
     const token = await this.authService.generateToken(result);
 
-    return {
+    return registerUserResponseSchema.parse({
       user: {
-        email: result.props.email,
-        username: result.props.username,
-        bio: result.props.bio,
-        image: result.props.image,
+        ...result.props,
         token,
       },
-    };
+    });
   }
 }

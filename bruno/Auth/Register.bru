@@ -1,0 +1,44 @@
+meta {
+  name: Register
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{apiurl}}/users
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "user": {
+      "username": "{{username}}",
+      "email": "{{email}}",
+      "password": "{{password}}"
+    }
+  }
+}
+
+assert {
+  res.status: eq 201
+  res.body.user.email: isString 
+  res.body.user.username: isString 
+  res.body.user.token: isString 
+  res.body.user.image: isDefined 
+  res.body.user.bio: isDefined 
+}
+
+script:pre-request {
+  const { faker } = require('@faker-js/faker');
+   
+  const firstName = faker.person.firstName();
+  const lastName = faker.person.lastName();
+  const username = faker.internet.userName({firstName, lastName});
+  const email = faker.internet.email({firstName, lastName});
+  const password = faker.internet.password();
+  
+  bru.setVar('username', username);
+  bru.setVar('email', email);
+  bru.setVar('password', password);
+}

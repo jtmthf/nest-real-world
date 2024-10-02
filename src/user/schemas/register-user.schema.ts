@@ -14,8 +14,8 @@ export const registerUserResponseSchema = z.object({
     email: z.string().email(),
     username: z.string(),
     token: z.string(),
-    bio: z.string().nullable(),
-    image: z.string().nullable(),
+    bio: z.preprocess((value) => value ?? null, z.string().nullable()),
+    image: z.preprocess((value) => value ?? null, z.string().nullable()),
   }),
 });
 
