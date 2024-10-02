@@ -22,11 +22,11 @@ body:json {
 
 assert {
   res.status: eq 201
-  res.body.user.email: isString 
-  res.body.user.username: isString 
-  res.body.user.token: isString 
-  res.body.user.image: isDefined 
-  res.body.user.bio: isDefined 
+  res.body.user.email: isString
+  res.body.user.username: isString
+  res.body.user.token: isString
+  res.body.user.image: isDefined
+  res.body.user.bio: isDefined
 }
 
 script:pre-request {
@@ -41,4 +41,8 @@ script:pre-request {
   bru.setVar('username', username);
   bru.setVar('email', email);
   bru.setVar('password', password);
+}
+
+script:post-response {
+  bru.setVar('token', res.body.user.token);
 }

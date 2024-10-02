@@ -21,6 +21,31 @@ export class UserRepository {
     return user;
   }
 
+  async findById(id: string): Promise<User | null> {
+    const [result] = await this.drizzle.db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .execute();
+
+    if (!result) {
+      return null;
+    }
+
+    const { createdAt, updatedAt, ...props } = result;
+
+    return new User({
+      id,
+      createdAt,
+      updatedAt,
+      props: {
+        ...props,
+        bio: props.bio ?? undefined,
+        image: props.image ?? undefined,
+      },
+    });
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     const [result] = await this.drizzle.db
       .select()

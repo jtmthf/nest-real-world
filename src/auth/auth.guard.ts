@@ -33,7 +33,7 @@ export class AuthGuard implements CanActivate {
 
   #extractTokenFromHeader(request: FastifyRequest): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+    return type === 'Token' ? token : undefined;
   }
 }
 

@@ -1,13 +1,17 @@
 meta {
-  name: Login
+  name: Current User
   type: http
   seq: 3
 }
 
-post {
-  url: {{apiurl}}/users/login
-  body: json
+get {
+  url: {{apiurl}}/user
+  body: none
   auth: none
+}
+
+headers {
+  Authorization: Token {{token}}
 }
 
 body:json {
@@ -26,8 +30,4 @@ assert {
   res.body.user.token: isString
   res.body.user.image: isDefined
   res.body.user.bio: isDefined
-}
-
-script:post-response {
-  bru.setVar('token', res.body.user.token);
 }
