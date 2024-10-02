@@ -1,0 +1,29 @@
+meta {
+  name: Login
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{apiurl}}/users/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "user": {
+      "email": "{{email}}",
+      "password": "{{password}}"
+    }
+  }
+}
+
+assert {
+  res.status: eq 200
+  res.body.user.email: isString
+  res.body.user.username: isString
+  res.body.user.token: isString
+  res.body.user.image: isDefined
+  res.body.user.bio: isDefined
+}

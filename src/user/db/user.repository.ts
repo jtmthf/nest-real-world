@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { eq } from 'drizzle-orm';
 import { DrizzleService } from 'src/common/drizzle.service';
 import { User } from '../user';
 import { users } from './user.schema';
@@ -18,5 +19,30 @@ export class UserRepository {
     user.clearEvents();
 
     return user;
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    const [result] = await this.drizzle.db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .execute();
+
+    if (!result) {
+      return null;
+    }
+
+    const { id, createdAt, updatedAt, ...props } = result;
+
+    return new User({
+      id,
+      createdAt,
+      updatedAt,
+      props: {
+        ...props,
+        bio: props.bio ?? undefined,
+        image: props.image ?? undefined,
+      },
+    });
   }
 }

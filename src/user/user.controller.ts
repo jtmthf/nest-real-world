@@ -1,4 +1,4 @@
-import { Body, Controller, Post, UsePipes } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, UsePipes } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
   ApiBody,
@@ -9,7 +9,15 @@ import {
 } from '@nestjs/swagger';
 import { AuthService } from 'src/auth/auth.service';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
+import { LoginUserCommand } from './commands/login-user/login-user.command';
 import { RegisterUserCommand } from './commands/register-user/register-user.command';
+import {
+  LoginUserDto,
+  loginUserJsonSchema,
+  loginUserResponseJsonSchema,
+  loginUserResponseSchema,
+  loginUserSchema,
+} from './schemas/login-user.schema';
 import {
   RegisterUserDto,
   registerUserJsonSchema,
@@ -39,6 +47,27 @@ export class UserController {
     const token = await this.authService.generateToken(result);
 
     return registerUserResponseSchema.parse({
+      user: {
+        ...result.props,
+        token,
+      },
+    });
+  }
+
+  @Post('users/login')
+  @HttpCode(200)
+  @ApiBody({ schema: loginUserJsonSchema } as ApiBodyOptions)
+  @ApiResponse({
+    status: 200,
+    description: 'User logged in',
+    schema: loginUserResponseJsonSchema,
+  } as ApiResponseOptions)
+  @UsePipes(new ZodValidationPipe(loginUserSchema))
+  async loginUser(@Body() { user }: LoginUserDto) {
+    const result = await this.commandBus.execute(new LoginUserCommand(user));
+    const token = await this.authService.generateToken(result);
+
+    return loginUserResponseSchema.parse({
       user: {
         ...result.props,
         token,

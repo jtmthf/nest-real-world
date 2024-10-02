@@ -15,8 +15,8 @@ export type CreateUserProps = CreateEntityProps<string, UserProps>;
 export class User extends AggregateRoot<string, UserProps> {
   validate(): void {}
 
-  static create({ id, props }: CreateUserProps): User {
-    const user = new User({ id, props });
+  static create({ id, props, createdAt, updatedAt }: CreateUserProps): User {
+    const user = new User({ id, props, createdAt, updatedAt });
 
     user.addEvent(
       new UserCreatedDomainEvent({
