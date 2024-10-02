@@ -1,4 +1,5 @@
 import { CommandHandler, IInferredCommandHandler } from '@nestjs/cqrs';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { PasswordService } from 'src/auth/password.service';
 import { UserRepository } from 'src/user/db/user.repository';
 import { User } from 'src/user/user';
@@ -11,6 +12,7 @@ export class LoginUserHandler
   constructor(
     private readonly repository: UserRepository,
     private readonly passwordService: PasswordService,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   async execute({
@@ -30,6 +32,9 @@ export class LoginUserHandler
     if (!isValidPassword) {
       throw new Error('Invalid password');
     }
+
+    user.login();
+    await user.publishEvents(this.eventEmitter);
 
     return user;
   }
