@@ -4,6 +4,7 @@ import {
   Get,
   HttpCode,
   Post,
+  Put,
   UseGuards,
   UsePipes,
 } from '@nestjs/common';
@@ -22,21 +23,27 @@ import { User } from 'src/common/decorators/user.decorator';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { LoginUserCommand } from './commands/login-user/login-user.command';
 import { RegisterUserCommand } from './commands/register-user/register-user.command';
+import { UpdateUserCommand } from './commands/update-user/update-user.command';
 import { UserByIdQuery } from './queries/user-by-id.query';
 import {
   LoginUserDto,
   loginUserJsonSchema,
-  loginUserResponseJsonSchema,
-  loginUserResponseSchema,
   loginUserSchema,
 } from './schemas/login-user.schema';
 import {
   RegisterUserDto,
   registerUserJsonSchema,
-  registerUserResponseJsonSchema,
-  registerUserResponseSchema,
   registerUserSchema,
 } from './schemas/register-user.schema';
+import {
+  UpdateUserDto,
+  updateUserJsonSchema,
+} from './schemas/update-user.schema';
+import {
+  UserResponseDto,
+  userResponseJsonSchema,
+  userResponseSchema,
+} from './schemas/user.schema';
 
 @Controller()
 @ApiTags('user')
@@ -52,14 +59,16 @@ export class UserController {
   @ApiResponse({
     status: 201,
     description: 'User created',
-    schema: registerUserResponseJsonSchema,
+    schema: userResponseJsonSchema,
   } as ApiResponseOptions)
   @UsePipes(new ZodValidationPipe(registerUserSchema))
-  async registerUser(@Body() { user }: RegisterUserDto) {
+  async registerUser(
+    @Body() { user }: RegisterUserDto,
+  ): Promise<UserResponseDto> {
     const result = await this.commandBus.execute(new RegisterUserCommand(user));
     const token = await this.authService.generateToken(result);
 
-    return registerUserResponseSchema.parse({
+    return userResponseSchema.parse({
       user: {
         ...result.props,
         token,
@@ -73,14 +82,14 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User logged in',
-    schema: loginUserResponseJsonSchema,
+    schema: userResponseJsonSchema,
   } as ApiResponseOptions)
   @UsePipes(new ZodValidationPipe(loginUserSchema))
-  async loginUser(@Body() { user }: LoginUserDto) {
+  async loginUser(@Body() { user }: LoginUserDto): Promise<UserResponseDto> {
     const result = await this.commandBus.execute(new LoginUserCommand(user));
     const token = await this.authService.generateToken(result);
 
-    return loginUserResponseSchema.parse({
+    return userResponseSchema.parse({
       user: {
         ...result.props,
         token,
@@ -93,15 +102,40 @@ export class UserController {
   @ApiResponse({
     status: 200,
     description: 'User fetched',
-    schema: loginUserResponseJsonSchema,
+    schema: userResponseJsonSchema,
   } as ApiResponseOptions)
-  async currentUser(@User() user: JwtPayload) {
+  async currentUser(@User() user: JwtPayload): Promise<UserResponseDto> {
     const result = await this.queryBus.execute(
       new UserByIdQuery({ id: user.sub }),
     );
     const token = await this.authService.generateToken(result);
 
-    return loginUserResponseSchema.parse({
+    return userResponseSchema.parse({
+      user: {
+        ...result.props,
+        token,
+      },
+    });
+  }
+
+  @Put('user')
+  @UseGuards(AuthGuard)
+  @ApiBody({ schema: updateUserJsonSchema } as ApiBodyOptions)
+  @ApiResponse({
+    status: 200,
+    description: 'User updated',
+    schema: userResponseJsonSchema,
+  } as ApiResponseOptions)
+  async updateUser(
+    @User() user: JwtPayload,
+    @Body() { user: props }: UpdateUserDto,
+  ): Promise<UserResponseDto> {
+    const result = await this.commandBus.execute(
+      new UpdateUserCommand({ ...props, userId: user.sub }),
+    );
+    const token = await this.authService.generateToken(result);
+
+    return userResponseSchema.parse({
       user: {
         ...result.props,
         token,

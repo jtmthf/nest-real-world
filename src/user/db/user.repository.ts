@@ -38,11 +38,7 @@ export class UserRepository {
       id,
       createdAt,
       updatedAt,
-      props: {
-        ...props,
-        bio: props.bio ?? undefined,
-        image: props.image ?? undefined,
-      },
+      props,
     });
   }
 
@@ -63,11 +59,20 @@ export class UserRepository {
       id,
       createdAt,
       updatedAt,
-      props: {
-        ...props,
-        bio: props.bio ?? undefined,
-        image: props.image ?? undefined,
-      },
+      props,
     });
+  }
+
+  async update(user: User): Promise<User> {
+    await this.drizzle.db
+      .update(users)
+      .set(user.props)
+      .where(eq(users.id, user.id))
+      .execute();
+
+    await user.publishEvents(this.eventEmitter);
+    user.clearEvents();
+
+    return user;
   }
 }

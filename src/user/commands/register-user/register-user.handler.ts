@@ -20,7 +20,10 @@ export class RegisterUserHandler
   }: RegisterUserCommand): Promise<User> {
     const id = this.idService.generateId();
     const passwordHash = await this.passwordService.hashPassword(password);
-    const user = User.create({ id, props: { ...props, passwordHash } });
+    const user = User.create({
+      id,
+      props: { ...props, passwordHash, bio: null, image: null },
+    });
 
     return await this.repository.insert(user);
   }
