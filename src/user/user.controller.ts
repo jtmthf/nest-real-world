@@ -5,7 +5,6 @@ import {
   HttpCode,
   Post,
   Put,
-  UseGuards,
   UsePipes,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -16,15 +15,15 @@ import {
   ApiResponseOptions,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from 'src/auth/auth.guard';
 import { AuthService } from 'src/auth/auth.service';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import { Public } from 'src/common/decorators/public.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { ZodValidationPipe } from 'src/common/pipes/zod-validation.pipe';
 import { LoginUserCommand } from './commands/login-user/login-user.command';
 import { RegisterUserCommand } from './commands/register-user/register-user.command';
 import { UpdateUserCommand } from './commands/update-user/update-user.command';
-import { UserByIdQuery } from './queries/user-by-id.query';
+import { UserByIdQuery } from './queries/user-by-id/user-by-id.query';
 import {
   LoginUserDto,
   loginUserJsonSchema,
@@ -55,6 +54,7 @@ export class UserController {
   ) {}
 
   @Post('users')
+  @Public()
   @ApiBody({ schema: registerUserJsonSchema } as ApiBodyOptions)
   @ApiResponse({
     status: 201,
@@ -77,6 +77,7 @@ export class UserController {
   }
 
   @Post('users/login')
+  @Public()
   @HttpCode(200)
   @ApiBody({ schema: loginUserJsonSchema } as ApiBodyOptions)
   @ApiResponse({
@@ -98,7 +99,6 @@ export class UserController {
   }
 
   @Get('user')
-  @UseGuards(AuthGuard)
   @ApiResponse({
     status: 200,
     description: 'User fetched',
@@ -119,7 +119,6 @@ export class UserController {
   }
 
   @Put('user')
-  @UseGuards(AuthGuard)
   @ApiBody({ schema: updateUserJsonSchema } as ApiBodyOptions)
   @ApiResponse({
     status: 200,

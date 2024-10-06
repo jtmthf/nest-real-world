@@ -5,7 +5,9 @@ import { LoginUserHandler } from './commands/login-user/login-user.handler';
 import { RegisterUserHandler } from './commands/register-user/register-user.handler';
 import { UpdateUserHandler } from './commands/update-user/update-user.handler';
 import { UserRepository } from './db/user.repository';
-import { UserByIdHandler } from './queries/user-by-id.handler';
+import { ProfileController } from './profile.controller';
+import { ProfileByUsernameHandler } from './queries/profile-by-username/profile-by-username.handler';
+import { UserByIdHandler } from './queries/user-by-id/user-by-id.handler';
 import { UserController } from './user.controller';
 
 const CommandHandlers = [
@@ -13,11 +15,11 @@ const CommandHandlers = [
   LoginUserHandler,
   UpdateUserHandler,
 ];
-const QueryHandlers = [UserByIdHandler];
+const QueryHandlers = [UserByIdHandler, ProfileByUsernameHandler];
 
 @Module({
   imports: [CqrsModule, AuthModule],
   providers: [...CommandHandlers, ...QueryHandlers, UserRepository],
-  controllers: [UserController],
+  controllers: [UserController, ProfileController],
 })
 export class UserModule {}

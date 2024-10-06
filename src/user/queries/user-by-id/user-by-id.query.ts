@@ -1,5 +1,5 @@
 import { Query } from '@nestjs-architects/typed-cqrs';
-import { User } from '../user';
+import { User } from '../../user';
 
 export interface UserByIdProps {
   id: string;

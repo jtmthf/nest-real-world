@@ -1,6 +1,6 @@
 import { IInferredQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { UserRepository } from '../db/user.repository';
-import { User } from '../user';
+import { UserRepository } from '../../db/user.repository';
+import { User } from '../../user';
 import { UserByIdQuery } from './user-by-id.query';
 
 @QueryHandler(UserByIdQuery)
