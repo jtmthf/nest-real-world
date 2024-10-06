@@ -19,6 +19,7 @@ export class DrizzleService {
 
     this.db = drizzle(client, {
       schema: { ...userSchema },
+      logger: true,
     });
   }
 }

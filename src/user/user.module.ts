@@ -4,6 +4,7 @@ import { AuthModule } from 'src/auth/auth.module';
 import { FollowUserHandler } from './commands/follow-user/follow-user.handler';
 import { LoginUserHandler } from './commands/login-user/login-user.handler';
 import { RegisterUserHandler } from './commands/register-user/register-user.handler';
+import { UnfollowUserHandler } from './commands/unfollow-user/unfollow-user.handler';
 import { UpdateUserHandler } from './commands/update-user/update-user.handler';
 import { FollowerRepository } from './db/follower.repository';
 import { UserRepository } from './db/user.repository';
@@ -17,6 +18,7 @@ const CommandHandlers = [
   LoginUserHandler,
   UpdateUserHandler,
   FollowUserHandler,
+  UnfollowUserHandler,
 ];
 const QueryHandlers = [UserByIdHandler, ProfileByUsernameHandler];
 

@@ -1,10 +1,11 @@
-import { Controller, Get, Param, Post } from '@nestjs/common';
+import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiResponse, ApiResponseOptions, ApiTags } from '@nestjs/swagger';
 import { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { Public } from 'src/common/decorators/public.decorator';
 import { User } from 'src/common/decorators/user.decorator';
 import { FollowUserCommand } from './commands/follow-user/follow-user.command';
+import { UnfollowUserCommand } from './commands/unfollow-user/unfollow-user.command';
 import { ProfileByUsernameQuery } from './queries/profile-by-username/profile-by-username.query';
 import { profileResponseJsonSchema } from './schemas/profile.schema';
 
@@ -46,6 +47,29 @@ export class ProfileController {
   ) {
     await this.commandBus.execute(
       new FollowUserCommand({
+        followerId: user.sub,
+        followingUsername: username,
+      }),
+    );
+    const profile = await this.queryBus.execute(
+      new ProfileByUsernameQuery({ username, userId: user.sub }),
+    );
+
+    return { profile };
+  }
+
+  @Delete('profiles/:username/follow')
+  @ApiResponse({
+    status: 200,
+    description: 'Unfollow user',
+    schema: profileResponseJsonSchema,
+  } as ApiResponseOptions)
+  async unfollowUser(
+    @User() user: JwtPayload,
+    @Param('username') username: string,
+  ) {
+    await this.commandBus.execute(
+      new UnfollowUserCommand({
         followerId: user.sub,
         followingUsername: username,
       }),
