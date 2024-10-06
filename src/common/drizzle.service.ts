@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { drizzle } from 'drizzle-orm/postgres-js';
+import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
+import * as userSchema from 'src/user/db/user.schema';
 
 @Injectable()
 export class DrizzleService {
-  db: ReturnType<typeof drizzle>;
+  db: PostgresJsDatabase<typeof userSchema>;
 
   constructor(config: ConfigService) {
     const user = config.get<string>('POSTGRES_USER');
@@ -16,6 +17,8 @@ export class DrizzleService {
       `postgres://${user}:${password}@0.0.0.0:5432/${db}`,
     );
 
-    this.db = drizzle(client);
+    this.db = drizzle(client, {
+      schema: { ...userSchema },
+    });
   }
 }

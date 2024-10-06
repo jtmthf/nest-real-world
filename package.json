@@ -11,6 +11,7 @@
     "generate": "drizzle-kit generate",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "migrate": "drizzle-kit migrate",
+    "repl": "npm run start:dev -- --entryFile repl",
     "start": "nest start",
     "start:debug": "nest start --debug --watch",
     "start:dev": "nest start --watch",
