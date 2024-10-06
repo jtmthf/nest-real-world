@@ -29,5 +29,7 @@ assert {
 }
 
 script:post-response {
-  bru.setVar('token', res.body.user.token);
+  if (res.status === 200) {
+    bru.setVar('token', res.body.user.token);
+  }
 }

@@ -1,0 +1,19 @@
+meta {
+  name: Get Profile (Auth)
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{apiurl}}/profiles/:username
+  body: none
+  auth: none
+}
+
+params:path {
+  username: {{username}}
+}
+
+headers {
+  Authorization: Token {{token}}
+}

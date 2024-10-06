@@ -65,6 +65,27 @@ export class UserRepository {
     });
   }
 
+  async findByUsername(username: string): Promise<User | null> {
+    const [result] = await this.drizzle.db
+      .select()
+      .from(users)
+      .where(eq(users.username, username))
+      .execute();
+
+    if (!result) {
+      return null;
+    }
+
+    const { id, createdAt, updatedAt, ...props } = result;
+
+    return new User({
+      id,
+      createdAt,
+      updatedAt,
+      props,
+    });
+  }
+
   async update(user: User): Promise<User> {
     await this.drizzle.db
       .update(users)
@@ -80,7 +101,7 @@ export class UserRepository {
 
   async findProfileByUsername(
     username: string,
-    userId: string | undefined,
+    userId?: string,
   ): Promise<Profile | null> {
     function withFollower<T extends PgSelect>(qb: T) {
       return qb.leftJoin(
